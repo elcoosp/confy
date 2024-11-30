@@ -1,0 +1,21 @@
+---
+source: project-meta/src/lib.rs
+expression: ok_result
+snapshot_kind: text
+---
+- name: "@elcoosp-configs/biome"
+  version: 0.0.2
+  description: Presets configs for biome
+  authors:
+    - elcoosp <elcoosp@gmail.com>
+  license: ~
+  keywords: ~
+  dependencies: ~
+  scripts:
+    build: rslib build
+    check: biome check --write
+    dev: rslib build --watch
+    fmt: biome format --write
+    test: vitest run
+    "test:cov": vitest run --coverage
+    "test:watch": vitest run --watch

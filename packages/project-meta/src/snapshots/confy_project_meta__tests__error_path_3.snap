@@ -1,0 +1,6 @@
+---
+source: project-meta/src/lib.rs
+expression: result
+snapshot_kind: text
+---
+Err: NoFilesFound

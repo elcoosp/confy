@@ -1,0 +1,15 @@
+---
+source: project-meta/src/lib.rs
+expression: ok_result
+snapshot_kind: text
+---
+- name: pyproject-toml-cheat-sheet
+  version: 1.0.0
+  description: "Python package developer's cheat sheet (using pyproject.toml)."
+  authors:
+    - ""
+  license: ~
+  keywords:
+    - somepyproj
+  dependencies: ~
+  scripts: ~
