@@ -66,7 +66,7 @@ impl ConfigFile {
 }
 
 impl ProjectMetadata {
-    pub fn from_config(config_file: &ConfigFile) -> Result<Self, MetadataError> {
+    pub fn from_config_file(config_file: &ConfigFile) -> Result<Self, MetadataError> {
         let file_path = config_file.file_path();
         let mut file = File::open(file_path)
             .map_err(|_| MetadataError::FileNotFound(file_path.to_string()))?;
@@ -227,7 +227,7 @@ impl ProjectMetadata {
         let mut metadata_list = Vec::new();
 
         for config_file in config_files {
-            match Self::from_config(&config_file) {
+            match Self::from_config_file(&config_file) {
                 Ok(metadata) => metadata_list.push(metadata),
                 Err(MetadataError::FileNotFound(_)) => continue,
                 Err(e) => return Err(e),

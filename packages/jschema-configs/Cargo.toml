@@ -12,12 +12,13 @@ prettyplease = { workspace = true }
 
 [dependencies]
 confique = { version = "0.1", features = ["toml"], optional = true }
+telety = { workspace = true, optional = true }
 serde_json = { workspace = true }
 serde = { workspace = true }
 regress = { workspace = true }
 thiserror = { workspace = true }
 cargo_toml = { workspace = true }
-
+confy-macros = { path = "../macros" }
 document-features = { workspace = true }
 
 [features]
@@ -34,3 +35,5 @@ deno = []
 pyproject = []
 ## Enable derive [Config](confique::Config) for [cargo](cargo::ConfigRoot), [deno](deno::ConfigRoot), [pyproject](pyproject::ConfigRoot), [package](package::ConfigRoot) `ConfigRoot`
 confique = ["dep:confique"]
+## Enable [telety] for [cargo](cargo::ConfigRoot), [deno](deno::ConfigRoot), [pyproject](pyproject::ConfigRoot), [package](package::ConfigRoot) `ConfigRoot`
+telety = ["dep:telety"]

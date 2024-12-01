@@ -9,12 +9,23 @@ fn build_schema(name: &str, root_to_rename: &str) {
     let derives = vec!["confique::Config".into()];
     #[cfg(not(feature = "confique"))]
     let derives = vec![];
-    let mut type_space = TypeSpace::new(
-        TypeSpaceSettings::default()
-            .with_struct_builder(true)
-            .with_derive("Clone".into())
-            .with_patch(root_to_rename, &TypeSpacePatch { rename, derives }),
-    );
+    let mut settings = TypeSpaceSettings::default();
+
+    settings
+        .with_struct_builder(true)
+        .with_derive("Clone".into())
+        .with_patch(
+            root_to_rename,
+            &TypeSpacePatch {
+                rename,
+                derives,
+                attrs: vec![],
+            },
+        );
+
+    #[cfg(feature = "telety")]
+    settings.with_attr(format!("#[telety::telety(crate::{name})]").into());
+    let mut type_space = TypeSpace::new(&settings);
     type_space.add_root_schema(schema).unwrap();
 
     let contents =

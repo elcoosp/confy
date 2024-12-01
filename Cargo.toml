@@ -1,6 +1,10 @@
 [workspace]
 resolver = "2"
-members = ["packages/project-meta", "packages/jschema-configs"]
+members = [
+    "packages/project-meta",
+    "packages/jschema-configs",
+    "packages/macros",
+]
 [workspace.dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -11,8 +15,9 @@ confique = { version = "0.1", features = ["toml"] }
 insta = { version = "1.41.1", features = ["yaml", "redactions"] }
 typify = { path = "../typify/typify" }
 schemars = "0.8.21"
-syn = "2"
+syn = { version = "2" }
 prettyplease = "0.2"
 regress = "0.10"
 cargo_toml = "0.20"
 document-features = "0.2"
+telety = "0.2.0"
