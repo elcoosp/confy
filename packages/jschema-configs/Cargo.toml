@@ -11,9 +11,26 @@ syn = { workspace = true }
 prettyplease = { workspace = true }
 
 [dependencies]
+confique = { version = "0.1", features = ["toml"], optional = true }
 serde_json = { workspace = true }
 serde = { workspace = true }
 regress = { workspace = true }
 thiserror = { workspace = true }
-confique = { workspace = true, features = ["toml"] }
 cargo_toml = { workspace = true }
+
+document-features = { workspace = true }
+
+[features]
+default = ["confique", "modules"]
+## Enable [pyproject], [deno], [package] and [cargo] module
+modules = ["pyproject", "deno", "package", "cargo"]
+## Enable [cargo] module
+cargo = []
+## Enable [package] module
+package = []
+## Enable [deno] module
+deno = []
+## Enable [pyproject] module
+pyproject = []
+## Enable derive [Config](confique::Config) for [cargo](cargo::ConfigRoot), [deno](deno::ConfigRoot), [pyproject](pyproject::ConfigRoot), [package](package::ConfigRoot) `ConfigRoot`
+confique = ["dep:confique"]
