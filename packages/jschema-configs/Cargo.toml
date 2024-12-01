@@ -16,3 +16,4 @@ serde = { workspace = true }
 regress = { workspace = true }
 thiserror = { workspace = true }
 confique = { workspace = true, features = ["toml"] }
+cargo_toml = { workspace = true }

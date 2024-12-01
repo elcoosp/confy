@@ -34,5 +34,6 @@ fn main() {
     );
     build_schema("deno", "DenoConfigurationFileSchema");
     // FIXME confique not available on JsonSchemaForNpmPackageJsonFilesVariant because enum
-    build_schema("package", "foo")
+    build_schema("package", "JsonSchemaForNpmPackageJsonFiles");
+    build_schema("cargo", "TomlManifest")
 }

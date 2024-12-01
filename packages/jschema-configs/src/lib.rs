@@ -7,3 +7,6 @@ pub mod deno {
 pub mod package {
     include!(concat!(env!("OUT_DIR"), "/package.rs"));
 }
+pub mod cargo {
+    include!(concat!(env!("OUT_DIR"), "/cargo.rs"));
+}
