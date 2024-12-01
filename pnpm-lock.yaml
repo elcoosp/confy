@@ -1,0 +1,22 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    devDependencies:
+      '@elcoosp-configs/cspell':
+        specifier: ^0.0.5
+        version: 0.0.5
+
+packages:
+
+  '@elcoosp-configs/cspell@0.0.5':
+    resolution: {integrity: sha512-1+ojobI42IxC8zuNVbhjqKj0bMo3WAKIGUnup2GjwWR8fjAq52BrxY1rqlVxZolvlotd1wgL/kJDSohwGciP+A==}
+
+snapshots:
+
+  '@elcoosp-configs/cspell@0.0.5': {}
