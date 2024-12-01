@@ -4,3 +4,6 @@ pub mod pyproject {
 pub mod deno {
     include!(concat!(env!("OUT_DIR"), "/deno.rs"));
 }
+pub mod package {
+    include!(concat!(env!("OUT_DIR"), "/package.rs"));
+}

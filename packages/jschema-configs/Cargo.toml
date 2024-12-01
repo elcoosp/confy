@@ -13,3 +13,6 @@ prettyplease = { workspace = true }
 [dependencies]
 serde_json = { workspace = true }
 serde = { workspace = true }
+regress = { workspace = true }
+thiserror = { workspace = true }
+confique = { workspace = true, features = ["toml"] }

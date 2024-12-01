@@ -9,7 +9,8 @@ anyhow = "1.0"
 thiserror = "1.0"
 confique = { version = "0.1", features = ["toml"] }
 insta = { version = "1.41.1", features = ["yaml", "redactions"] }
-typify = "0.2.0"
+typify = { path = "../typify/typify" }
 schemars = "0.8.21"
 syn = "2"
 prettyplease = "0.2"
+regress = "0.10"
