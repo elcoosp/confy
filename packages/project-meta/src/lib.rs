@@ -30,7 +30,6 @@ pub enum Dependencies {
 pub struct DependencyDetails {
     version: Option<String>,
     url: Option<String>,
-    // Ajoutez d'autres champs si nécessaire
 }
 
 #[derive(Error, Debug, Serialize, Deserialize)]

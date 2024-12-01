@@ -1,0 +1,14 @@
+import:
+  - ./node_modules/@elcoosp-configs/cspell/src/base-ts.yml
+ignorePaths:
+  - target
+  - node_modules
+  - "*.cast"
+words:
+  # User
+  - elcoosp
+  - insta
+  - pyproject
+  - confique
+  - thiserror
+  - confy
