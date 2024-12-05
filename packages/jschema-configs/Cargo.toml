@@ -11,7 +11,7 @@ syn = { workspace = true }
 prettyplease = { workspace = true }
 
 [dependencies]
-confique = { version = "0.1", features = ["toml"], optional = true }
+confique = { version = "0.3", features = ["toml"], optional = true }
 serde_json = { workspace = true }
 serde = { workspace = true }
 regress = { workspace = true }
