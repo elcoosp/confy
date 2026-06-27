@@ -13,6 +13,6 @@ typify = { path = "../typify/typify" }
 schemars = "1.0.0"
 syn = "2"
 prettyplease = "0.2"
-regress = "0.10"
+regress = "0.11"
 cargo_toml = "1.0"
 document-features = "0.2"
