@@ -24,7 +24,7 @@ jobs:
     outputs:
       content: ${{ steps.cliff.outputs.content }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -71,7 +71,7 @@ jobs:
             target: x86_64-pc-windows-msvc
             archive: zip
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
@@ -127,7 +127,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: crates.io
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
       - name: Publish confy-jschema-configs
         run: cargo publish -p confy-jschema-configs
