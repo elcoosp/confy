@@ -1,0 +1,13 @@
+[package]
+name = "biome-configs"
+version = "0.0.2"
+description = "Presets configs for biome"
+authors = ["elcoosp <elcoosp@gmail.com>"]
+license = "MIT"
+keywords = ["biome", "config"]
+
+[dependencies]
+serde = "1.0"
+local = { path = "../local" }
+gitdep = { git = "https://github.com/elcoosp/gitdep" }
+workspace_dep = { workspace = true }
