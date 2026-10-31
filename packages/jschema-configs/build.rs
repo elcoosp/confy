@@ -1,30 +1,22 @@
 use std::{env, fs, path::Path};
 
 use typify::{TypeSpace, TypeSpacePatch, TypeSpaceSettings};
-fn build_schema(name: &str, root_to_rename: &str) {
-    let content = std::fs::read_to_string(format!("schemas/{name}.json")).unwrap();
-    let schema = serde_json::from_str::<schemars::schema::RootSchema>(&content).unwrap();
-    let rename = Some("ConfigRoot".to_string());
-    #[cfg(feature = "confique")]
-    let derives = vec!["confique::Config".into()];
-    #[cfg(not(feature = "confique"))]
-    let derives = vec![];
-    let mut settings = TypeSpaceSettings::default();
 
+fn build_schema(name: &str, root_to_rename: &str) {
+    let content = fs::read_to_string(format!("schemas/{name}.json")).unwrap();
+    let schema = serde_json::from_str::<schemars::schema::RootSchema>(&content).unwrap();
+
+    let mut patch = TypeSpacePatch::default();
+    patch.with_rename("ConfigRoot");
+    #[cfg(feature = "confique")]
+    patch.with_derive("confique::Config");
+
+    let mut settings = TypeSpaceSettings::default();
     settings
         .with_struct_builder(true)
-        .with_derive("Clone".into())
-        .with_patch(
-            root_to_rename,
-            &TypeSpacePatch {
-                rename,
-                derives,
-                attrs: vec![],
-            },
-        );
+        .with_derive("Clone".to_string())
+        .with_patch(root_to_rename, &patch);
 
-    #[cfg(feature = "telety")]
-    settings.with_attr(format!("#[telety::telety(crate::{name})]").into());
     let mut type_space = TypeSpace::new(&settings);
     type_space.add_root_schema(schema).unwrap();
 
@@ -35,12 +27,14 @@ fn build_schema(name: &str, root_to_rename: &str) {
     out_file.push(format!("{name}.rs"));
     fs::write(out_file, contents).unwrap();
 }
+
 fn main() {
+    println!("cargo:rerun-if-changed=schemas");
     build_schema(
         "pyproject",
         "JsonSchemaForPythonProjectMetadataAndConfiguration",
     );
     build_schema("deno", "DenoConfigurationFileSchema");
     build_schema("package", "JsonSchemaForNpmPackageJsonFiles");
-    build_schema("cargo", "TomlManifest")
+    build_schema("cargo", "TomlManifest");
 }
