@@ -1,0 +1,16 @@
+---
+source: packages/project-meta/src/tests.rs
+expression: metadata
+---
+name: pyproject-toml-cheat-sheet
+version: 1.0.0
+description: "Python package developer's cheat sheet (using pyproject.toml)."
+authors:
+  - Your Name <you@yourdomain.com>
+license: MIT License
+keywords:
+  - somepyproj
+dependencies:
+  stringcase:
+    spec: ~=1.2.0
+    source: registry

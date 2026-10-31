@@ -1,0 +1,5 @@
+---
+source: packages/project-meta/src/tests.rs
+expression: result
+---
+Err: NoFilesFound

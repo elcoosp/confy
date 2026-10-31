@@ -1,0 +1,26 @@
+---
+source: packages/project-meta/src/tests.rs
+expression: metadata
+---
+name: biome-configs
+version: 0.0.2
+description: Presets configs for biome
+authors:
+  - elcoosp <elcoosp@gmail.com>
+license: MIT
+keywords:
+  - biome
+  - config
+dependencies:
+  gitdep:
+    spec: "https://github.com/elcoosp/gitdep"
+    source: git
+  local:
+    spec: "../local"
+    source: path
+  serde:
+    spec: "1.0"
+    source: registry
+  workspace_dep:
+    spec: ""
+    source: workspace
