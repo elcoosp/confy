@@ -1,7 +1,16 @@
 [package]
 name = "confy-jschema-configs"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+authors.workspace = true
+description = "Typed, feature-gated config structs generated from the package.json, Cargo.toml, deno.json and pyproject.toml JSON schemas"
+keywords.workspace = true
+categories.workspace = true
+
 [build-dependencies]
 typify = { workspace = true }
 serde = { workspace = true }
@@ -11,14 +20,10 @@ syn = { workspace = true }
 prettyplease = { workspace = true }
 
 [dependencies]
-confique = { version = "0.1", features = ["toml"], optional = true }
-telety = { workspace = true, optional = true }
+confique = { version = "0.4.0", features = ["toml"], optional = true }
 serde_json = { workspace = true }
 serde = { workspace = true }
 regress = { workspace = true }
-thiserror = { workspace = true }
-cargo_toml = { workspace = true }
-confy-macros = { path = "../macros" }
 document-features = { workspace = true }
 
 [features]
@@ -35,5 +40,35 @@ deno = []
 pyproject = []
 ## Enable derive [Config](confique::Config) for [cargo](cargo::ConfigRoot), [deno](deno::ConfigRoot), [pyproject](pyproject::ConfigRoot), [package](package::ConfigRoot) `ConfigRoot`
 confique = ["dep:confique"]
-## Enable [telety] for [cargo](cargo::ConfigRoot), [deno](deno::ConfigRoot), [pyproject](pyproject::ConfigRoot), [package](package::ConfigRoot) `ConfigRoot`
-telety = ["dep:telety"]
+
+[lints.rust]
+unsafe_code = "forbid"
+missing_docs = { level = "allow", priority = 1 }
+dead_code = { level = "allow", priority = 1 }
+
+[lints.rustdoc]
+# Bare URLs in the upstream schema descriptions of the generated docs.
+bare_urls = { level = "allow", priority = 1 }
+
+[lints.clippy]
+# The crate body is ~99% typify-generated code from third-party JSON schemas.
+# The lints below are unfixable inside generated output; they are waived here,
+# once and explicitly, instead of scattering `#[allow]` attributes across the
+# build script. Everything else (pedantic, nursery, style) stays enforced.
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+default_trait_access = "allow"
+return_self_not_must_use = "allow"
+must_use_candidate = "allow"
+doc_markdown = "allow"
+use_self = "allow"
+missing_const_for_fn = "allow"
+derivable_impls = "allow"
+type_complexity = "allow"
+same_functions_in_if_condition = "allow"
+option_if_let_else = "allow"
+implicit_hasher = "allow"
+struct_excessive_bools = "allow"
+semicolon_if_nothing_returned = "allow"
+items_after_statements = "allow"
+empty_line_after_doc_comments = "allow"
