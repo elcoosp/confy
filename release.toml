@@ -1,0 +1,17 @@
+# cargo-release configuration: `cargo release [level]` bumps versions,
+# creates the release commit, tags it as v<version> and pushes, which
+# triggers the git-cliff based release workflow.
+# https://github.com/crate-ci/cargo-release
+
+allow-branch = ["main"]
+sign-tag = false
+shared-version = true           # keep all three crates on the same version
+consolidate-commits = true      # one chore(release) commit for the workspace
+pre-release-commit-message = "chore(release): {{version}}"
+tag-message = "{{version}}"
+tag-prefix = "v"                # matches cliff.toml tag_pattern
+pre-release-hook = ["git-cliff", "-o", "CHANGELOG.md"]
+pre-release-replacements = []
+publish = true
+verify = true
+push = true
