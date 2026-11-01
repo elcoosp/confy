@@ -23,7 +23,7 @@ thiserror = "2.0.21"
 confique = { version = "0.4.0", features = ["toml"] }
 insta = { version = "1.49.0", features = ["yaml", "redactions"] }
 typify = "0.8.0"
-schemars = "0.8.22"
+schemars = "1.0.0"
 syn = "3.0.9"
 prettyplease = "0.3.0"
 regress = "0.12.0"
