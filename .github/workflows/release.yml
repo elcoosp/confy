@@ -24,7 +24,7 @@ jobs:
     outputs:
       content: ${{ steps.cliff.outputs.content }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -42,7 +42,7 @@ jobs:
             cat release-notes.md
             echo EOF
           } >> "$GITHUB_OUTPUT"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: changelog
           path: release-notes.md
@@ -71,7 +71,7 @@ jobs:
             target: x86_64-pc-windows-msvc
             archive: zip
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
@@ -99,7 +99,7 @@ jobs:
           Copy-Item README.md, LICENSE "$dir/"
           Compress-Archive -Path "$dir" -DestinationPath "$dir.zip"
           (Get-FileHash "$dir.zip" -Algorithm SHA256).Hash | Set-Content "$dir.zip.sha256"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-${{ matrix.target }}
           path: |
@@ -111,11 +111,11 @@ jobs:
     needs: [changelog, build]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           path: artifacts
           merge-multiple: true
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           body: ${{ needs.changelog.outputs.content }}
           files: |
@@ -127,7 +127,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: crates.io
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
       - name: Publish confy-jschema-configs
         run: cargo publish -p confy-jschema-configs
