@@ -1,6 +1,6 @@
+# Cargo build artefacts
 /target
-target/
-.DS_Store
-/lcov.info
-/coverage
-*.profraw
+
+# Local helper script (never commit it): stages and commits the pending
+# changes as one conventional commit per file.
+commit.sh
