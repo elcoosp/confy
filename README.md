@@ -2,14 +2,14 @@
   <img src="docs/logo.png" alt="Confy Logo" width="200"/>
   <p>
     <strong>A modular Rust toolkit that extracts, normalises and cross-checks project metadata across the four major ecosystem config files, written in Rust.</strong><br/>
-    Implements a complete metadata pipeline: config file detection (package.json, Cargo.toml, deno.json, pyproject.toml), dependency-spec normalisation across ecosystems, structured field diffing, and typed, feature-gated config structs generated from the official JSON schemas. The project is organised as a Cargo workspace with 3 crates, a unified CLI, enforced 100% test coverage on hand-written code, and a git-cliff driven release pipeline.
+    Implements a complete metadata pipeline: config file detection (package.json, Cargo.toml, deno.json, pyproject.toml), dependency-spec normalisation across ecosystems, structured field diffing, repository-scale recursive scanning, and typed, feature-gated config structs generated from the official JSON schemas. The project is organised as a Cargo workspace with 4 crates, a unified CLI, enforced 100% test coverage on hand-written code, and a git-cliff driven release pipeline.
   </p>
   <p>
     <img src="https://img.shields.io/badge/Rust-2024%20edition-000000?style=flat-square&logo=rust" alt="Rust"/>
     <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License MIT"/>
-    <img src="https://img.shields.io/badge/Crates-3-6F4E37?style=flat-square" alt="Crates"/>
+    <img src="https://img.shields.io/badge/Crates-4-6F4E37?style=flat-square" alt="Crates"/>
     <img src="https://img.shields.io/badge/Inputs-package.json%20%7C%20Cargo.toml%20%7C%20deno.json%20%7C%20pyproject.toml-CB3837?style=flat-square" alt="Config files"/>
-    <img src="https://img.shields.io/badge/CLI-detect%20%2B%20meta%20%2B%20check%20%2B%20schema-4B32C3?style=flat-square" alt="CLI"/>
+    <img src="https://img.shields.io/badge/CLI-detect%20%2B%20meta%20%2B%20check%20%2B%20scan%20%2B%20schema-4B32C3?style=flat-square" alt="CLI"/>
     <img src="https://img.shields.io/badge/Config%20Types-Schema%20Derived-262D3A?style=flat-square" alt="Typed configs"/>
     <img src="https://img.shields.io/badge/Layered%20Config-confique%20derive-6A0DAD?style=flat-square" alt="confique"/>
     <img src="https://img.shields.io/badge/Diffing-Structured%20Fields-FF4500?style=flat-square" alt="Diffing"/>
@@ -30,6 +30,7 @@ Modern repositories often mix ecosystems — an npm package, a Rust workspace, a
 - **Detect** which config files exist in a directory.
 - **Extract** metadata (name, version, description, authors, license, keywords, dependencies, scripts) with ecosystem quirks normalised away.
 - **Compare** config files and get structured, per-field mismatches instead of eyeballing diffs.
+- **Scan** a whole repository tree recursively and check every project directory at once (monorepo ready).
 - **Generate** fully typed Rust structs from the official JSON schemas (via [typify]), optionally deriving [confique]'s layered `Config`.
 - **Ship** a single static CLI that bundles all of the above.
 
@@ -38,8 +39,9 @@ Modern repositories often mix ecosystems — an npm package, a Rust workspace, a
 | Crate | Path | Description |
 | --- | --- | --- |
 | `confy-project-meta` | [`packages/project-meta`](packages/project-meta) | Core library: `ConfigFile` detection, metadata parsing, dependency normalisation, structured diffing |
+| `confy-project-tree` | [`packages/project-tree`](packages/project-tree) | Repository-scale layer: recursive config discovery with ignore rules, per-directory grouping, whole-tree consistency checks and duplicate-name detection (benchmarked with criterion) |
 | `confy-jschema-configs` | [`packages/jschema-configs`](packages/jschema-configs) | Typed `ConfigRoot` structs code-generated from the package.json / Cargo.toml / deno.json / pyproject.toml JSON schemas |
-| `confy-cli` | [`packages/cli`](packages/cli) | The `confy` binary: `detect`, `meta`, `check`, `schema` subcommands |
+| `confy-cli` | [`packages/cli`](packages/cli) | The `confy` binary: `detect`, `meta`, `check`, `scan`, `schema` subcommands |
 
 ## Installation
 
@@ -58,19 +60,19 @@ packages/../package.json    # → prints each found path
 
 $ confy check .             # verify all config files agree (exit 1 on mismatch)
 
-$ confy meta . --format json
+$ confy scan .              # recursively scan the repo tree (JSON report)
 {
-  "configs": [
+  "root": ".",
+  "groups": [
     {
-      "path": "package.json",
-      "name": "@elcoosp-configs/biome",
-      "version": "0.0.2",
-      "description": "Presets configs for biome",
-      "authors": ["elcoosp <elcoosp@gmail.com>"],
-      "scripts": { "build": "rslib build", "...": "..." }
+      "dir": ".",
+      "entries": [ { "config": { "kind": "package_json", "path": "package.json" }, "metadata": { "name": "@elcoosp-configs/biome", "...": "..." } } ]
     }
-  ]
+  ],
+  "issues": []
 }
+
+$ confy scan . --check      # ... and verify every directory agrees (exit 1 on mismatch)
 
 $ confy schema cargo        # print an embedded ecosystem JSON schema
 ```
@@ -97,6 +99,25 @@ for m in mismatches {
 
 // Enforce cross-file consistency.
 ProjectMetadata::check_config_files_equality(std::path::Path::new("."))?;
+```
+
+Repository-scale scanning (`confy-project-tree`):
+
+```rust
+use confy_project_tree::{ProjectTree, ScanOptions};
+
+// Discover every config file in the tree, pruning node_modules, target,
+// .git, hidden dirs and friends (see DEFAULT_IGNORED_DIRS).
+let configs = ProjectTree::discover(std::path::Path::new("."), &ScanOptions::default())?;
+
+// Or scan + parse everything, grouped per directory.
+let tree = ProjectTree::scan(std::path::Path::new("."), &ScanOptions::default())?;
+for mismatch in tree.check_group_consistency() {
+    eprintln!("{mismatch}");
+}
+for duplicate in tree.duplicate_names() {
+    eprintln!("{duplicate}");
+}
 ```
 
 ### Normalisation rules
