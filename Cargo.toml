@@ -26,7 +26,7 @@ typify = "0.8.0"
 # typify 0.8 still consumes the `schemars::schema::RootSchema` API, which only
 # exists in the 0.8 line; schemars 1.x made that module private. The build
 # script parses the JSON schemas into the exact type `typify` expects.
-schemars = "0.8.22"
+schemars = "1.0.0"
 syn = "3.0.9"
 prettyplease = "0.3.0"
 regress = "0.12.0"
