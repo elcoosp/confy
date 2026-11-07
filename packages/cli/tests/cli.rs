@@ -87,6 +87,66 @@ fn binary_detect_meta_check_flow() {
 }
 
 #[test]
+fn binary_scan_reports_nested_tree() {
+    let dir = tempdir().unwrap();
+    fs::write(
+        dir.path().join("package.json"),
+        r#"{ "name": "root", "version": "1.0" }"#,
+    )
+    .unwrap();
+    let nested = dir.path().join("packages/lib");
+    fs::create_dir_all(&nested).unwrap();
+    fs::write(
+        nested.join("Cargo.toml"),
+        "[package]\nname = \"lib\"\nversion = \"1.0\"\n",
+    )
+    .unwrap();
+
+    // Scan lists both groups in the JSON report.
+    Command::cargo_bin("confy")
+        .unwrap()
+        .arg("scan")
+        .arg(dir.path())
+        .assert()
+        .success()
+        .stdout(contains("packages/lib/Cargo.toml"))
+        .stdout(contains("\"root\""));
+
+    // A clean tree passes `scan --check`.
+    Command::cargo_bin("confy")
+        .unwrap()
+        .arg("scan")
+        .arg("--check")
+        .arg(dir.path())
+        .assert()
+        .success()
+        .stdout(contains("agree"));
+
+    // A directory disagreeing with itself fails with exit code 1.
+    fs::write(
+        nested.join("deno.json"),
+        r#"{ "name": "lib", "version": "2.0" }"#,
+    )
+    .unwrap();
+    Command::cargo_bin("confy")
+        .unwrap()
+        .arg("scan")
+        .arg("--check")
+        .arg(dir.path())
+        .assert()
+        .failure()
+        .stderr(contains("metadata mismatch"));
+
+    // An unknown root is an error (exit code 2).
+    Command::cargo_bin("confy")
+        .unwrap()
+        .arg("scan")
+        .arg(dir.path().join("missing"))
+        .assert()
+        .failure();
+}
+
+#[test]
 fn binary_schema_prints_json() {
     Command::cargo_bin("confy")
         .unwrap()
