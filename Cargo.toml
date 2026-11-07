@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["packages/project-meta", "packages/jschema-configs", "packages/cli"]
+members = ["packages/project-meta", "packages/jschema-configs", "packages/project-tree", "packages/cli"]
 
 [workspace.package]
 version = "0.2.0"
@@ -23,13 +23,17 @@ thiserror = "2.0.21"
 confique = { version = "0.4.0", features = ["toml"] }
 insta = { version = "1.49.0", features = ["yaml", "redactions"] }
 typify = "0.8.0"
-schemars = "1.2.3"
+# typify 0.8 still consumes the `schemars::schema::RootSchema` API, which only
+# exists in the 0.8 line; schemars 1.x made that module private. The build
+# script parses the JSON schemas into the exact type `typify` expects.
+schemars = "0.8.22"
 syn = "3.0.9"
 prettyplease = "0.3.0"
 regress = "0.12.0"
 document-features = "0.2.12"
 clap = { version = "4.6.7", features = ["derive"] }
 tempfile = "3.27.0"
+criterion = "0.5.1"
 
 [workspace.lints.rust]
 unsafe_code = "deny"
