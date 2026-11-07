@@ -33,7 +33,7 @@ regress = "0.12.0"
 document-features = "0.2.12"
 clap = { version = "4.6.7", features = ["derive"] }
 tempfile = "3.27.0"
-criterion = "0.5.1"
+criterion = "0.8.0"
 
 [workspace.lints.rust]
 unsafe_code = "deny"
