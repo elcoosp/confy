@@ -1,0 +1,29 @@
+[package]
+name = "confy-project-tree"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+authors.workspace = true
+description = "Recursive project-tree scanning: discover config files across a repository, group them per directory and check consistency at tree scale"
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+confy-project-meta = { path = "../project-meta", version = "0.2.0" }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+tempfile = { workspace = true }
+criterion = { workspace = true }
+
+[[bench]]
+name = "scan"
+harness = false
+
+[lints]
+workspace = true
