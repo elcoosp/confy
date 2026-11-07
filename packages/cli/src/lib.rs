@@ -1,5 +1,6 @@
 //! `confy` command line interface: detect project config files, extract and
-//! compare their metadata, and print the embedded ecosystem JSON schemas.
+//! compare their metadata, scan whole repository trees recursively, and print
+//! the embedded ecosystem JSON schemas.
 //!
 //! All logic lives in the library target so it is unit-testable; `main.rs`
 //! is a thin wrapper around [`run`].
@@ -11,6 +12,7 @@ use std::process::ExitCode;
 use anyhow::{Context, anyhow};
 use clap::{Parser, Subcommand, ValueEnum};
 use confy_project_meta::{ConfigFile, MetadataError, ProjectMetadata};
+use confy_project_tree::{ProjectTree, ScanOptions};
 
 /// Embedded JSON schemas shipped with `confy-jschema-configs`.
 const SCHEMA_PACKAGE: &str = include_str!("../../jschema-configs/schemas/package.json");
@@ -103,6 +105,20 @@ pub enum Command {
         #[arg(default_value = ".")]
         dir: PathBuf,
     },
+    /// Recursively scan a directory tree for config files and report the
+    /// metadata of every project directory found.
+    Scan {
+        /// Root directory to scan recursively.
+        #[arg(default_value = ".")]
+        dir: PathBuf,
+        /// Output format.
+        #[arg(short, long, value_enum, default_value = "json")]
+        format: Format,
+        /// Also verify that the config files of every directory agree
+        /// (exit 1 on any mismatch).
+        #[arg(long)]
+        check: bool,
+    },
     /// Print one of the embedded ecosystem JSON schemas.
     Schema {
         /// Ecosystem schema to print.
@@ -121,6 +137,7 @@ pub fn run(cli: Cli) -> anyhow::Result<ExitCode> {
         Command::Detect { dir } => detect(&dir),
         Command::Meta { dir, format } => meta(&dir, format),
         Command::Check { dir } => check(&dir),
+        Command::Scan { dir, format, check } => scan(&dir, format, check),
         Command::Schema { kind } => {
             println!("{}", kind.schema());
             Ok(ExitCode::SUCCESS)
@@ -186,6 +203,33 @@ fn check(dir: &Path) -> anyhow::Result<ExitCode> {
         }
         Err(error) => Err(error.into()),
     }
+}
+
+fn scan(dir: &Path, format: Format, check: bool) -> anyhow::Result<ExitCode> {
+    let tree = ProjectTree::scan(dir, &ScanOptions::default())?;
+    if tree.groups.is_empty() && tree.issues.is_empty() {
+        return Err(anyhow!("no config files found in {}", dir.display()));
+    }
+    if !tree.issues.is_empty() {
+        for issue in &tree.issues {
+            eprintln!("warning: {issue}");
+        }
+    }
+    match format {
+        Format::Json => println!("{}", serde_json::to_string_pretty(&tree)?),
+        Format::Toml => println!("{}", toml::to_string_pretty(&tree)?),
+    }
+    if check {
+        let mismatches = tree.check_group_consistency();
+        if !mismatches.is_empty() {
+            for mismatch in &mismatches {
+                eprintln!("{mismatch}");
+            }
+            return Ok(ExitCode::from(1));
+        }
+        println!("all {} project groups agree", tree.groups.len());
+    }
+    Ok(ExitCode::SUCCESS)
 }
 
 #[cfg(test)]
@@ -278,5 +322,74 @@ mod tests {
             assert_eq!(run(cli).unwrap(), ExitCode::SUCCESS);
         }
         assert!(Cli::try_parse_from(["confy", "schema", "nope"]).is_err());
+    }
+
+    #[test]
+    fn scan_prints_json_and_toml_reports() {
+        let dir = tempdir().unwrap();
+        write_pkg(dir.path(), "x", "1.0");
+        for format in ["json", "toml"] {
+            let cli = Cli::try_parse_from([
+                "confy",
+                "scan",
+                dir.path().to_str().unwrap(),
+                "--format",
+                format,
+            ])
+            .unwrap();
+            assert_eq!(run(cli).unwrap(), ExitCode::SUCCESS);
+        }
+    }
+
+    #[test]
+    fn scan_empty_dir_is_an_error() {
+        let dir = tempdir().unwrap();
+        let cli = Cli::try_parse_from(["confy", "scan", dir.path().to_str().unwrap()]).unwrap();
+        assert!(run(cli).is_err());
+    }
+
+    #[test]
+    fn scan_missing_root_is_an_error() {
+        let dir = tempdir().unwrap();
+        let missing = dir.path().join("missing");
+        let cli = Cli::try_parse_from(["confy", "scan", missing.to_str().unwrap()]).unwrap();
+        assert!(run(cli).is_err());
+    }
+
+    #[test]
+    fn scan_warns_about_parse_issues_and_succeeds() {
+        let dir = tempdir().unwrap();
+        write_pkg(dir.path(), "x", "1.0");
+        // A broken file does not abort the scan: it is reported as a
+        // warning on stderr while the report still prints.
+        fs::write(dir.path().join("Cargo.toml"), "[[[ nope").unwrap();
+        let cli = Cli::try_parse_from(["confy", "scan", dir.path().to_str().unwrap()]).unwrap();
+        assert_eq!(run(cli).unwrap(), ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn scan_check_exit_codes() {
+        let dir = tempdir().unwrap();
+        write_pkg(dir.path(), "x", "1.0");
+        let cli = Cli::try_parse_from(["confy", "scan", "--check", dir.path().to_str().unwrap()])
+            .unwrap();
+        assert_eq!(run(cli).unwrap(), ExitCode::SUCCESS);
+
+        // A nested directory disagreeing with itself triggers exit 1.
+        let nested = dir.path().join("nested");
+        fs::create_dir_all(&nested).unwrap();
+        fs::write(
+            nested.join("package.json"),
+            r#"{ "name": "x", "version": "1.0" }"#,
+        )
+        .unwrap();
+        fs::write(
+            nested.join("deno.json"),
+            r#"{ "name": "x", "version": "2.0" }"#,
+        )
+        .unwrap();
+        let cli = Cli::try_parse_from(["confy", "scan", "--check", dir.path().to_str().unwrap()])
+            .unwrap();
+        assert_eq!(run(cli).unwrap(), ExitCode::from(1));
     }
 }
