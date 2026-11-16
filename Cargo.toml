@@ -22,7 +22,7 @@ anyhow = "1.0.104"
 thiserror = "2.0.21"
 confique = { version = "0.4.0", features = ["toml"] }
 insta = { version = "1.49.0", features = ["yaml", "redactions"] }
-typify = "0.8.0"
+typify = "0.10.0"
 # typify 0.8 still consumes the `schemars::schema::RootSchema` API, which only
 # exists in the 0.8 line; schemars 1.x made that module private. The build
 # script parses the JSON schemas into the exact type `typify` expects.
