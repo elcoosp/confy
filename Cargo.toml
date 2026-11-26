@@ -17,23 +17,23 @@ categories = ["config", "development-tools"]
 [workspace.dependencies]
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
-toml = "1.1.8"
-anyhow = "1.0.104"
+toml = "1.2.3"
+anyhow = "1.0.105"
 thiserror = "2.0.21"
-confique = { version = "0.4.0", features = ["toml"] }
+confique = { version = "0.5.0", features = ["toml"] }
 insta = { version = "1.49.0", features = ["yaml", "redactions"] }
 typify = "0.8.0"
 # typify 0.8 still consumes the `schemars::schema::RootSchema` API, which only
 # exists in the 0.8 line; schemars 1.x made that module private. The build
 # script parses the JSON schemas into the exact type `typify` expects.
 schemars = "0.8.22"
-syn = "3.0.9"
+syn = "3.0.10"
 prettyplease = "0.3.0"
 regress = "0.12.0"
 document-features = "0.2.12"
-clap = { version = "4.6.7", features = ["derive"] }
+clap = { version = "4.6.10", features = ["derive"] }
 tempfile = "3.27.0"
-criterion = "0.5.1"
+criterion = "0.8.2"
 
 [workspace.lints.rust]
 unsafe_code = "deny"
